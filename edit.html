@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edytuj notatkę</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      padding: 2rem;
+    }
+    textarea {
+      width: 50%;
+      height: 300px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+    <center>
+
+        <h2>🖊️ Edytuj notatkę</h2>
+        <textarea id="editNote"></textarea><br>
+        <button onclick="saveEditedNote()">Zapisz zmiany</button>
+        <button onclick="window.location.href='index.html'">Wróć</button>
+    </center>
+
+  <script>
+    let noteIndex = null;
+
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function loadNote() {
+      noteIndex = parseInt(getQueryParam('index'));
+      const notes = JSON.parse(localStorage.getItem('noteHistory')) || [];
+
+      if (!isNaN(noteIndex) && notes[noteIndex]) {
+        document.getElementById('editNote').value = notes[noteIndex].text;
+      } else {
+        alert('Nie znaleziono notatki.');
+        window.close();
+      }
+    }
+
+    function saveEditedNote() {
+      const notes = JSON.parse(localStorage.getItem('noteHistory')) || [];
+      if (notes[noteIndex]) {
+        notes[noteIndex].text = document.getElementById('editNote').value;
+        notes[noteIndex].time = new Date().toLocaleString();
+        localStorage.setItem('noteHistory', JSON.stringify(notes));
+        alert('Zapisano zmiany.');
+      }
+    }
+
+    window.onload = loadNote;
+  </script>
+</body>
+</html>

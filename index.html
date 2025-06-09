@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Notes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    textarea {
+      width: 96%;
+      height: 150px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    .note {
+      background-color: #f1f5f9;
+      padding: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+    .note-actions {
+      margin-top: 0.5rem;
+    }
+    .note-actions button {
+      margin-right: 0.5rem;
+      background-color: #0284c7;
+    }
+    .note-actions button.delete {
+      background-color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📝 Moje Notatki</h1>
+  </header>
+  <main>
+    <textarea id="noteInput" placeholder="Wpisz nową notatkę..."></textarea>
+    <button onclick="saveNote()">Zapisz notatkę</button>
+
+    <section id="notes"></section>
+  </main>
+
+  <script>
+    function saveNote() {
+      const text = document.getElementById('noteInput').value.trim();
+      if (!text) return alert('Notatka nie może być pusta.');
+
+      const notes = JSON.parse(localStorage.getItem('noteHistory')) || [];
+      notes.unshift({
+        time: new Date().toLocaleString(),
+        text: text
+      });
+      localStorage.setItem('noteHistory', JSON.stringify(notes));
+      document.getElementById('noteInput').value = '';
+      loadNotes();
+    }
+
+    function loadNotes() {
+      const notes = JSON.parse(localStorage.getItem('noteHistory')) || [];
+      const container = document.getElementById('notes');
+      container.innerHTML = '';
+
+      notes.forEach((note, index) => {
+        const div = document.createElement('div');
+        div.className = 'note';
+        div.innerHTML = `
+          <strong>${note.time}</strong>
+          <p>${note.text}</p>
+          <div class="note-actions">
+            <button onclick="editNote(${index})">Edytuj</button>
+            <button class="delete" onclick="deleteNote(${index})">Usuń</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function editNote(index) {
+      window.open(`edit.html?index=${index}`, '_blank');
+    }
+
+    function deleteNote(index) {
+      if (confirm('Czy na pewno chcesz usunąć tę notatkę?')) {
+        const notes = JSON.parse(localStorage.getItem('noteHistory')) || [];
+        notes.splice(index, 1);
+        localStorage.setItem('noteHistory', JSON.stringify(notes));
+        loadNotes();
+      }
+    }
+
+    window.onload = loadNotes;
+  </script>
+</body>
+</html>
